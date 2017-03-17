@@ -25,8 +25,6 @@ $sanitize_all_escapes=true;
 
 require_once("../interface/globals.php");
 require_once("$srcdir/log.inc");
-require_once("$srcdir/formdata.inc.php");
-require_once("$srcdir/formatting.inc.php");
 
 
 	$valid  = true;
@@ -50,7 +48,7 @@ require_once("$srcdir/formatting.inc.php");
 	}
 	else
 	{
-		echo xl("Audit Log validation failed") . "(ERROR:: $errors[0])";
+		echo xl("Audit Log Validation Failed") . "(ERROR:: $errors[0])";
 	}
 
 	function catch_logs(){

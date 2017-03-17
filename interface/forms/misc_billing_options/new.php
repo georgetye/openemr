@@ -6,6 +6,7 @@
  *
  * Copyright (C) 2007 Bo Huynh
  * Copyright (C) 2016 Terry Hill <terry@lillysystems.com>
+ * Copyright (C) 2017 Brady Miller <brady.g.miller@gmail.com>
  *
  * LICENSE: This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,7 +31,6 @@ $sanitize_all_escapes=true;
 require_once("../../globals.php");
 require_once("$srcdir/options.inc.php");
 require_once("$srcdir/api.inc");
-require_once("$srcdir/formdata.inc.php");
 require_once("date_qualifier_options.php");
 
 
@@ -77,15 +77,13 @@ function genProviderSelect($selname, $toptext, $default=0, $disabled=false) {
 <html>
 <head>
 <?php html_header_show(); ?>
-<script type="text/javascript" src="<?php echo $GLOBALS['assets_static_relative']; ?>/jquery-min-1-2-1/index.js"></script>
-<script type="text/javascript" src="<?php echo $GLOBALS['webroot'] ?>/library/textformat.js"></script>
-<link rel="stylesheet" href="<?php echo $css_header;?>" type="text/css">
 
-<!-- pop up calendar -->
-<style type="text/css">@import url(<?php echo $GLOBALS['webroot'] ?>/library/dynarch_calendar.css);</style>
-<script type="text/javascript" src="<?php echo $GLOBALS['webroot'] ?>/library/dynarch_calendar.js"></script>
-<script type="text/javascript" src="<?php echo $GLOBALS['webroot'] ?>/library/dynarch_calendar_en.js"></script>
-<script type="text/javascript" src="<?php echo $GLOBALS['webroot'] ?>/library/dynarch_calendar_setup.js"></script>
+<link rel="stylesheet" href="<?php echo $css_header;?>" type="text/css">
+<link rel="stylesheet" href="<?php echo $GLOBALS['assets_static_relative']; ?>/jquery-datetimepicker-2-5-4/build/jquery.datetimepicker.min.css">
+
+<script type="text/javascript" src="<?php echo $GLOBALS['assets_static_relative']; ?>/jquery-min-3-1-1/index.js"></script>
+<script type="text/javascript" src="<?php echo $GLOBALS['webroot'] ?>/library/textformat.js?v=<?php echo $v_js_includes; ?>"></script>
+<script type="text/javascript" src="<?php echo $GLOBALS['assets_static_relative']; ?>/jquery-datetimepicker-2-5-4/build/jquery.datetimepicker.full.min.js"></script>
 
 </head>
 <body class="body_top">
@@ -97,8 +95,8 @@ function genProviderSelect($selname, $toptext, $default=0, $disabled=false) {
 <label><span class=text><?php echo xlt('BOX 10 B. Auto Accident '); ?>: </span><input type=checkbox name="auto_accident" value="1" <?php if ($obj['auto_accident'] == "1") echo "checked";?>></label>
 <span class=text><?php echo xlt('State'); ?>: </span><input type=entry name="accident_state" size=1 value="<?php echo attr($obj{"accident_state"});?>" ><br><br>
 <label><span class=text><?php echo xlt('BOX 10 C. Other Accident '); ?>: </span><input type=checkbox name="other_accident" value="1" <?php if ($obj['other_accident'] == "1") echo "checked";?>></label><br><br>
-<span class=text><?php echo xlt('BOX 10 D. EPSDT Referral Code ');?></span><input type=entry style="width: 25px;" size=2 name="medicaid_referral_code" value="<?php echo attr($obj{"medicaid_referral_code"});?>" >&nbsp;&nbsp;&nbsp;&nbsp;
-<label><span class=text><?php echo xlt('EPSDT '); ?>: </span><input type=checkbox name="epsdt_flag" value="1" <?php if ($obj['epsdt_flag'] == "1") echo "checked";?>></label><br><br>
+<span class=text><?php echo xlt('BOX 10 D. EPSDT Referral Code');?> </span><input type=entry style="width: 25px;" size=2 name="medicaid_referral_code" value="<?php echo attr($obj{"medicaid_referral_code"});?>" >&nbsp;&nbsp;&nbsp;&nbsp;
+<label><span class=text><?php echo xlt('EPSDT'); ?> : </span><input type=checkbox name="epsdt_flag" value="1" <?php if ($obj['epsdt_flag'] == "1") echo "checked";?>></label><br><br>
 <span class="text" title="<?php echo xla("For HCFA 02/12 Onset date specified on the Encounter Form needs a qualifier");?>"></span>
 <span class=text title="<?php echo xla('For HCFA 02/12 Box 15 is Other Date with a qualifier to specify what the date indicates');?>"></span>
  <tr>
@@ -107,25 +105,19 @@ function genProviderSelect($selname, $toptext, $default=0, $disabled=false) {
  <tr>
   <td><span class=text><?php echo xlt('BOX 16. Date unable to work from');?>:</span></td>
   <td><?php $off_work_from = $obj{"off_work_from"}; ?>
-    <input type=text style="width: 70px;" size=10 name='off_work_from' id='off_work_from'
+    <input type=text style="width: 70px;" size=10 class='datepicker' name='off_work_from' id='off_work_from'
     value='<?php echo attr($off_work_from); ?>'
-    title='<?php echo xla('yyyy-mm-dd'); ?>'
-    onkeyup='datekeyup(this,mypcc)' onblur='dateblur(this,mypcc)' />
-    <img src='../../pic/show_calendar.gif' align='absbottom' width='24' height='22'
-    id='img_off_work_from' border='0' alt='[?]' style='cursor:pointer'
-    title='<?php echo xla("Click here to choose a date"); ?>'></td>
+    title='<?php echo xla('yyyy-mm-dd'); ?>' />
+  </td>
  </tr>
  &nbsp;&nbsp;
 <tr>
  <td><span class=text><?php echo xlt('BOX 16. Date unable to work to');?>:</span></td>
   <td><?php $off_work_to = $obj{"off_work_to"}; ?>
-    <input type=text style="width: 70px;" size=10 name='off_work_to' id='off_work_to'
+    <input type=text style="width: 70px;" size=10 class='datepicker' name='off_work_to' id='off_work_to'
     value='<?php echo attr($off_work_to); ?>'
-    title='<?php echo xla('yyyy-mm-dd'); ?>'
-    onkeyup='datekeyup(this,mypcc)' onblur='dateblur(this,mypcc)' />
-    <img src='../../pic/show_calendar.gif' align='absbottom' width='24' height='22'
-    id='img_off_work_to' border='0' alt='[?]' style='cursor:pointer'
-    title='<?php echo xla("Click here to choose a date"); ?>'></td>
+    title='<?php echo xla('yyyy-mm-dd'); ?>' />
+  </td>
  </tr>
     <br><br>
 
@@ -142,25 +134,19 @@ function genProviderSelect($selname, $toptext, $default=0, $disabled=false) {
 <tr>
  <td><span class=text><?php echo xlt('BOX 18. Hospitalization date from');?>:</span></td>
  <td><?php $hospitalization_date_from = $obj{"hospitalization_date_from"}; ?>
-    <input type=text style="width: 70px;" size=10 name='hospitalization_date_from' id='hospitalization_date_from'
+    <input type=text style="width: 70px;" size=10 class='datepicker' name='hospitalization_date_from' id='hospitalization_date_from'
     value='<?php echo attr($hospitalization_date_from); ?>'
-    title='<?php echo xla('yyyy-mm-dd'); ?>'
-    onkeyup='datekeyup(this,mypcc)' onblur='dateblur(this,mypcc)' />
-    <img src='../../pic/show_calendar.gif' align='absbottom' width='24' height='22'
-    id='img_hospitalization_date_from' border='0' alt='[?]' style='cursor:pointer'
-    title='<?php echo xla("Click here to choose a date"); ?>'></td>
+    title='<?php echo xla('yyyy-mm-dd'); ?>' />
+  </td>
  </tr>
  &nbsp;&nbsp;
  <tr>
   <td><span class=text><?php echo xlt('BOX 18. Hospitalization date to');?>:</span></td>
   <td><?php $hospitalization_date_to = $obj{"hospitalization_date_to"}; ?>
-    <input type=text style="width: 70px;" size=10 name='hospitalization_date_to' id='hospitalization_date_to'
+    <input type=text style="width: 70px;" size=10 class='datepicker' name='hospitalization_date_to' id='hospitalization_date_to'
     value='<?php echo attr($hospitalization_date_to); ?>'
-    title='<?php echo xla('yyyy-mm-dd'); ?>'
-    onkeyup='datekeyup(this,mypcc)' onblur='dateblur(this,mypcc)' />
-    <img src='../../pic/show_calendar.gif' align='absbottom' width='24' height='22'
-    id='img_hospitalization_date_to' border='0' alt='[?]' style='cursor:pointer'
-    title='<?php echo xla("Click here to choose a date"); ?>'></td>
+    title='<?php echo xla('yyyy-mm-dd'); ?>' />
+  </td>
  </tr>
     <br><br>
 <span class=text><?php echo xlt('BOX 20. Is Outside Lab used?'); ?>: </span><input type=checkbox name="outside_lab" value="1" <?php if ($obj['outside_lab'] == "1") echo "checked";?>>
@@ -169,7 +155,7 @@ function genProviderSelect($selname, $toptext, $default=0, $disabled=false) {
 <span class=text><?php echo xlt(' Medicaid Original Reference No. ');?></span><input type=entry size=15 name="medicaid_original_reference" value="<?php echo attr($obj{"medicaid_original_reference"});?>" ><br><br>
 <span class=text><?php echo xlt('BOX 23. Prior Authorization No. ');?></span><input type=entry size=15 name="prior_auth_number" value="<?php echo attr($obj{"prior_auth_number"});?>" ><br><br>
 <label><span class=text><?php echo xlt('X12 only: Replacement Claim '); ?>: </span><input type=checkbox name="replacement_claim" value="1" <?php if ($obj['replacement_claim'] == "1") echo "checked";?>></label><br><br>
-<span class=text><?php echo xlt('X12 only ICN resubmission No. ');?></span><input type=entry size=35 name="icn_resubmission_number" value="<?php echo attr($obj{"icn_resubmission_number"});?>" ><br><br>
+<span class=text><?php echo xlt('X12 only ICN resubmission No.');?> </span><input type=entry size=35 name="icn_resubmission_number" value="<?php echo attr($obj{"icn_resubmission_number"});?>" ><br><br>
 
 <table>
 <tr>
@@ -187,17 +173,20 @@ function genProviderSelect($selname, $toptext, $default=0, $disabled=false) {
 </div>
 </form>
 <script language="javascript">
-/* required for popup calendar */
-Calendar.setup({inputField:"hospitalization_date_from", ifFormat:"%Y-%m-%d", button:"img_hospitalization_date_from"});
-Calendar.setup({inputField:"hospitalization_date_to", ifFormat:"%Y-%m-%d", button:"img_hospitalization_date_to"});
-Calendar.setup({inputField:"off_work_from", ifFormat:"%Y-%m-%d", button:"img_off_work_from"});
-Calendar.setup({inputField:"off_work_to", ifFormat:"%Y-%m-%d", button:"img_off_work_to"});
 
 // jQuery stuff to make the page a little easier to use
 
 $(document).ready(function(){
     $(".save").click(function() { top.restoreSession(); document.my_form.submit(); });
     $(".dontsave").click(function() { location.href='<?php echo "$rootdir/patient_file/encounter/encounter_top.php";?>'; });
+
+    $('.datepicker').datetimepicker({
+        <?php $datetimepicker_timepicker = false; ?>
+        <?php $datetimepicker_showseconds = false; ?>
+        <?php $datetimepicker_formatInput = false; ?>
+        <?php require($GLOBALS['srcdir'] . '/js/xl/jquery-datetimepicker-2-5-4.js.php'); ?>
+        <?php // can add any additional javascript settings to datetimepicker here; need to prepend first setting with a comma ?>
+    });
 });
 </script>
 </body>

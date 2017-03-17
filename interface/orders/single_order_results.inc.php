@@ -20,10 +20,7 @@
 */
 
 require_once($GLOBALS["srcdir"] . "/acl.inc");
-require_once($GLOBALS["srcdir"] . "/formdata.inc.php");
 require_once($GLOBALS["srcdir"] . "/options.inc.php");
-require_once($GLOBALS["srcdir"] . "/formatting.inc.php");
-require_once($GLOBALS["srcdir"] . "/classes/Document.class.php");
 
 function getListItem($listid, $value) {
   $lrow = sqlQuery("SELECT title FROM list_options " .
@@ -228,10 +225,10 @@ function generate_result_row(&$ctx, &$row, &$rrow, $priors_omitted=false) {
       		if($narrative_note_list == '') $narrative_note_list = 'Narrative Notes:';
       		$narrative_note_list .= $nnote;
       	}
-      	
+
       	if($narrative_note_list != ''){ if ($result_noteid) $result_noteid .= ', '; $result_noteid .= 1 + storeNote($narrative_note_list);}
       }
-      
+
     }
     else {
       echo "  <td>";
@@ -345,7 +342,7 @@ function generate_order_report($orderid, $input_form=false, $genstyles=true, $fi
 
 <?php if (empty($GLOBALS['PATIENT_REPORT_ACTIVE'])) { ?>
 
-<script type="text/javascript" src="<?php echo $GLOBALS['webroot']; ?>/library/dialog.js"></script>
+<script type="text/javascript" src="<?php echo $GLOBALS['webroot']; ?>/library/dialog.js?v=<?php echo $v_js_includes; ?>"></script>
 <script language="JavaScript">
 
 var mypcc = '<?php echo $GLOBALS['phone_country_code'] ?>';
@@ -461,7 +458,7 @@ function educlick(codetype, codevalue) {
   <td><?php echo xlt('Note'); ?></td>
  </tr>
 
-<?php 
+<?php
   $query = "SELECT " .
     "po.lab_id, po.date_ordered, pc.procedure_order_seq, pc.procedure_code, " .
     "pc.procedure_name, " .
@@ -596,7 +593,7 @@ function educlick(codetype, codevalue) {
 <?php } ?>
 <?php if (empty($GLOBALS['PATIENT_REPORT_ACTIVE'])) { ?>
    &nbsp;
-   <input type='button' value='<?php echo xla('Related Patient Notes'); ?>' 
+   <input type='button' value='<?php echo xla('Related Patient Notes'); ?>'
     onclick='showpnotes(<?php echo $orderid; ?>)' />
 <?php } ?>
 <?php if ($input_form && $ctx['sign_list']) { ?>

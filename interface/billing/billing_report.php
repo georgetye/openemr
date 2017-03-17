@@ -33,9 +33,6 @@ require_once("../../custom/code_types.inc.php");
 require_once("$srcdir/patient.inc");
 include_once("$srcdir/../interface/reports/report.inc.php");//Criteria Section common php page
 require_once("$srcdir/billrep.inc");
-require_once(dirname(__FILE__) . "/../../library/classes/OFX.class.php");
-require_once(dirname(__FILE__) . "/../../library/classes/X12Partner.class.php");
-require_once("$srcdir/formatting.inc.php");
 require_once("$srcdir/options.inc.php");
 require_once("adjustment_reason_codes.php");
 
@@ -333,7 +330,7 @@ function MarkAsCleared(Type)
     {
      Message='<?php echo htmlspecialchars( xl('After saving the TEXT file(s), click [View Log] to check for errors.'), ENT_QUOTES); ?>';
     }
-  if(confirm(Message + "\n\n\n<?php echo addslashes( xl('Total') ); ?>" + ' ' + CheckBoxBillingCount + ' ' +  "<?php echo addslashes( xl('Selected') ); ?>\n" + 
+  if(confirm(Message + "\n\n\n<?php echo addslashes( xl('Total') ); ?>" + ' ' + CheckBoxBillingCount + ' ' +  "<?php echo addslashes( xl('Selected') ); ?>\n" +
   "<?php echo addslashes( xl('Would You Like them to be Marked as Cleared.') ); ?>"))
    {
     document.getElementById('HiddenMarkAsCleared').value='yes';
@@ -378,7 +375,7 @@ document.onclick=TakeActionOnHide;
 <form name='the_form' method='post' action='billing_report.php' onsubmit='return top.restoreSession()' style="display:inline">
 
 <style type="text/css">@import url(../../library/dynarch_calendar.css);</style>
-<script type="text/javascript" src="../../library/dialog.js"></script>
+<script type="text/javascript" src="../../library/dialog.js?v=<?php echo $v_js_includes; ?>"></script>
 <script type="text/javascript" src="../../library/textformat.js"></script>
 <script type="text/javascript" src="../../library/dynarch_calendar.js"></script>
 <?php include_once("{$GLOBALS['srcdir']}/dynarch_calendar_en.inc.php"); ?>
@@ -455,23 +452,23 @@ if(!isset($_REQUEST['mode']))//default case
  {
   $_REQUEST['final_this_page_criteria'][0]="(form_encounter.date between '".date("Y-m-d 00:00:00")."' and '".date("Y-m-d 23:59:59")."')";
   $_REQUEST['final_this_page_criteria'][1]="billing.billed = '0'";
-  
+
   $_REQUEST['final_this_page_criteria_text'][0]=xl("Date of Service = Today");
   $_REQUEST['final_this_page_criteria_text'][1]=xl("Billing Status = Unbilled");
-  
+
   $_REQUEST['date_master_criteria_form_encounter_date']="today";
   $_REQUEST['master_from_date_form_encounter_date']=date("Y-m-d");
   $_REQUEST['master_to_date_form_encounter_date']=date("Y-m-d");
-  
+
   $_REQUEST['radio_billing_billed']=0;
- 
+
  }
 ?>
 <table width='100%' border="0" cellspacing="0" cellpadding="0">
  <tr>
       <td width="25%">&nbsp;</td>
       <td width="50%">
-            <?php include_once("$srcdir/../interface/reports/criteria.tab.php"); ?>      
+            <?php include_once("$srcdir/../interface/reports/criteria.tab.php"); ?>
       </td>
       <td width="25%">
 <?php
@@ -479,7 +476,7 @@ if(!isset($_REQUEST['mode']))//default case
                                                         // Criteria section Ends -->
 // ============================================================================================================================================= -->
 ?>
-      
+
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
           <tr>
             <td width="15%">&nbsp;</td>
@@ -489,20 +486,20 @@ if(!isset($_REQUEST['mode']))//default case
           </tr>
           <tr>
             <td>&nbsp;</td>
-            <td><a onClick="javascript:return SubmitTheScreenPrint();" href="#" 
+            <td><a onClick="javascript:return SubmitTheScreenPrint();" href="#"
     class='link_submit'  ><?php echo '['. xlt('View Printable Report').']' ?></a></td>
           </tr>
-		  
-	 <?php if ($daysheet) { ?> 
+
+	 <?php if ($daysheet) { ?>
 		  <tr>
             <td>&nbsp;</td>
-            <td><a onClick="javascript:return SubmitTheEndDayPrint();" href="#" 
+            <td><a onClick="javascript:return SubmitTheEndDayPrint();" href="#"
     class='link_submit'  ><?php echo '['.xlt('End Of Day Report').']' ?></a>
-	<?php if ($daysheet_total) { ?> 
+	<?php if ($daysheet_total) { ?>
 	<span class=text><?php echo xlt('Totals'); ?> </span>
 	<input type=checkbox  name="end_of_day_totals_only" value="1" <?php if ($obj['end_of_day_totals_only'] === '1') echo "checked";?>>
 	<?php } ?>
-	<?php if ($provider_run) { ?> 
+	<?php if ($provider_run) { ?>
 	<span class=text><?php echo xlt('Provider'); ?> </span>
 	<input type=checkbox  name="end_of_day_provider_only" value="1" <?php if ($obj['end_of_day_provider_only'] === '1') echo "checked";?>>
 	<?php } ?>
@@ -529,7 +526,7 @@ if(!isset($_REQUEST['mode']))//default case
           </tr>
       </table>
 
-      
+
       </td>
  </tr>
 </table>
@@ -568,7 +565,7 @@ if(!isset($_REQUEST['mode']))//default case
  <?php if ($GLOBALS['preprinted_cms_1500']) { ?>
 <input type="submit" class="subbtn" style="width:210px;" name="bn_process_hcfa_form" value="<?php echo xla('CMS 1500 PREPRINTED FORM')?>"
  title="<?php echo xla('Generate and download CMS 1500 paper claims on Preprinted form')?>"
- onclick="MarkAsCleared(2)"> 
+ onclick="MarkAsCleared(2)">
  <?php } ?>
 <input type="submit" class="subbtn" style="width:120px;" name="bn_hcfa_txt_file" value="<?php echo xla('CMS 1500 TEXT')?>"
  title="<?php echo xla('Making batch text files for uploading to Clearing House and will mark as billed')?>"
@@ -701,7 +698,7 @@ if(is_array($ret))
 
   $mmo_empty_mod = false;
   $mmo_num_charges = 0;
-  
+
   foreach ($ret as $iter) {
 
     // We include encounters here that have never been billed.  However
@@ -814,8 +811,8 @@ if(is_array($ret))
              }
          ?>
         </script>
-        <?php 
-                
+        <?php
+
             //  Not sure why the next section seems to do nothing except post "To Encounter" button 2/17/09  JCH
       $lhtml .= "&nbsp;&nbsp;&nbsp;<a class=\"link_submit\" " .
         "href=\"javascript:window.toencounter(" . $iter['enc_pid'] .
@@ -826,7 +823,7 @@ if(is_array($ret))
                  top.window.parent.left_nav.setPatientEncounter(EncounterIdArray[" . $iter['enc_pid'] . "],EncounterDateArray[" . $iter['enc_pid'] .
                  "], CalendarCategoryArray[" . $iter['enc_pid'] . "])\">[" .
         xlt('To Enctr') . " " . text(oeFormatShortDate($raw_encounter_date)) . "]</a>";
-        
+
             //  Changed "To xxx" buttons to allow room for encounter date display 2/17/09  JCH
       $lhtml .= "&nbsp;&nbsp;&nbsp;<a class=\"link_submit\" " .
         "href=\"javascript:window.topatient(" . $iter['enc_pid'] .
@@ -893,7 +890,7 @@ if(is_array($ret))
         }
         $lhtml .= "</select>";
         $DivPut='yes';
-		
+
 		if($GLOBALS['notes_to_display_in_Billing'] == 1 || $GLOBALS['notes_to_display_in_Billing'] == 3) {
           $lhtml .= "<br><span style='margin-left: 20px; font-weight bold; color: green'>".text($enc_billing_note)."</span>";
         }
@@ -1133,7 +1130,7 @@ if(is_array($ret))
     }
     $rhtml .= "</tr>\n";
     $last_encounter_id = $this_encounter_id;
-    
+
   } // end foreach
 
   if ($lhtml) {
@@ -1171,21 +1168,21 @@ $(document).ready(function() {
 		top.restoreSession();
         dlgopen('customize_log.php', '_blank', 500, 400);
     });
-    
+
     $('input[type="submit"]').click( function() {
 		top.restoreSession();
         $(this).attr('data-clicked', true);
     });
-    
+
     $('form[name="update_form"]').submit( function(e) {
         var clickedButton = $("input[type=submit][data-clicked='true'")[0];
-        
+
         // clear clicked button indicator
         $('input[type="submit"]').attr('data-clicked', false);
-        
+
         if ( !clickedButton || $(clickedButton).attr("data-open-popup") !== "true" ) {
             $(this).removeAttr("target");
-            return top.restoreSession(); 
+            return top.restoreSession();
         } else {
 			top.restoreSession();
             var w = window.open('about:blank','Popup_Window','toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=400,height=300,left = 312,top = 234');

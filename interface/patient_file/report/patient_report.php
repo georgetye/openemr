@@ -5,7 +5,6 @@ require_once("$srcdir/lists.inc");
 require_once("$srcdir/acl.inc");
 require_once("$srcdir/forms.inc");
 require_once("$srcdir/patient.inc");
-require_once("$srcdir/formatting.inc.php");
 
 // get various authorization levels
 $auth_notes_a  = acl_check('encounters', 'notes_a');
@@ -218,6 +217,9 @@ function show_date_fun(){
    <input type='checkbox' name='include_transactions' id='include_transactions' value="transactions"><?php xl('Transactions','e'); ?><br>
    <input type='checkbox' name='include_batchcom' id='include_batchcom' value="batchcom"><?php xl('Communications','e'); ?><br>
   </td>
+     <td class="text">
+         <input type='checkbox' name='include_recurring_days' id='include_recurring_days' value="recurring_days" ><?php echo  xlt('Recurrent Appointments'); ?><br>
+     </td>
  </tr>
 </table>
 
@@ -342,7 +344,7 @@ while($result = sqlFetchArray($res)) {
             }
             $html_strings = array();
             echo "</div>\n"; // end DIV encounter_forms
-            echo "</div>\n\n";  //end DIV encounter_data 
+            echo "</div>\n\n";  //end DIV encounter_data
             echo "<br>";
         }
         $isfirst = 0;
@@ -378,7 +380,7 @@ while($result = sqlFetchArray($res)) {
         // if the form does not match precisely with any names in the registry, now see if any front partial matches
         // and change $form_name appropriately so it will print above in $toprint = $html_strings[$var]
         if (!$form_name_found_flag) { foreach($registry_form_name as $var) {if (strpos($form_name,$var) == 0) {$form_name = $var;}}}
-     
+
         if (!is_array($html_strings[$form_name])) {$html_strings[$form_name] = array();}
         array_push($html_strings[$form_name], "<input type='checkbox' ".
                                                 " name='" . $result{"formdir"} . "_" . $result{"form_id"} . "'".
@@ -550,13 +552,13 @@ $(document).ready(function(){
                 $("#ccr_form").submit();
         });
 	$(".viewCCD").click(
-	function() { 
+	function() {
 		var ccrAction = document.getElementsByName('ccrAction');
 		ccrAction[0].value = 'viewccd';
                 var raw = document.getElementsByName('raw');
                 raw[0].value = 'no';
 		top.restoreSession();
-                ccr_form.setAttribute("target", "_blank"); 
+                ccr_form.setAttribute("target", "_blank");
 		$("#ccr_form").submit();
                 ccr_form.setAttribute("target", "");
 	});
@@ -686,7 +688,7 @@ function issueClick(issue) {
         if ($(issue).val().indexOf('/' + $(this).val() + '/') >= 0) {
             $(this).attr("checked", "checked");
         }
-            
+
     });
 }
 

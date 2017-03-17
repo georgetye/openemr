@@ -34,16 +34,11 @@ require_once("$srcdir/invoice_summary.inc.php");
 require_once("$srcdir/sl_eob.inc.php");
 require_once("$srcdir/parse_era.inc.php");
 require_once("../../library/acl.inc");
-require_once("$srcdir/sql.inc");
 require_once("$srcdir/auth.inc");
-require_once("$srcdir/formdata.inc.php");
 require_once("../../custom/code_types.inc.php");
 require_once("$srcdir/patient.inc");
 require_once("$srcdir/billrep.inc");
-require_once(dirname(__FILE__) . "/../../library/classes/OFX.class.php");
-require_once(dirname(__FILE__) . "/../../library/classes/X12Partner.class.php");
 require_once("$srcdir/options.inc.php");
-require_once("$srcdir/formatting.inc.php");
 require_once("$srcdir/payment.inc.php");
 //===============================================================================
 	$screen='edit_payment';
@@ -294,7 +289,7 @@ if (isset($_POST["mode"]))
 				  sqlStatement("update ar_activity set "    .
 					"   post_user = '" . trim($user_id            )  .
 					"', modified_time = '"  . trim($created_time					) .
-					"', memo = '"    . "Deductable $".trim(formData("Deductible$CountRow"   )) .
+					"', memo = '"    . "Deductible $".trim(formData("Deductible$CountRow"   )) .
 					"', account_code = '" . "Deduct"  .
 					"', payer_type = '"   . trim(formData("HiddenIns$CountRow"   )) .
 					"' where  session_id ='$payment_id' and pid ='" . trim(formData("HiddenPId$CountRow"   ))  .
@@ -488,7 +483,7 @@ if (isset($_POST["mode"]))
 $payment_id=$payment_id*1 > 0 ? $payment_id : $_REQUEST['payment_id'];
 $ResultSearchSub = sqlStatement("SELECT  distinct encounter,code_type,code,modifier, pid from ar_activity where  session_id ='$payment_id' order by pid,encounter,code,modifier");
 //==============================================================================
-$DateFormat=DateFormatRead();
+
 //==============================================================================
 //===============================================================================
 ?>
@@ -498,29 +493,22 @@ $DateFormat=DateFormatRead();
 <?php if (function_exists('html_header_show')) html_header_show(); ?>
 
 <link rel="stylesheet" href="<?php echo $css_header;?>" type="text/css">
+<link rel="stylesheet" type="text/css" href="../../library/js/fancybox/jquery.fancybox-1.2.6.css" media="screen" />
+<link rel="stylesheet" href="<?php echo $GLOBALS['assets_static_relative']; ?>/jquery-datetimepicker-2-5-4/build/jquery.datetimepicker.min.css">
 
 <!-- supporting javascript code -->
-
-<script type="text/javascript" src="<?php echo $GLOBALS['webroot'] ?>/library/dialog.js"></script>
-
-
-
-<link rel="stylesheet" href="<?php echo $css_header;?>" type="text/css">
-<link rel="stylesheet" type="text/css" href="../../library/js/fancybox/jquery.fancybox-1.2.6.css" media="screen" />
-<style type="text/css">@import url(../../library/dynarch_calendar.css);</style>
-<script type="text/javascript" src="../../library/textformat.js"></script>
-<script type="text/javascript" src="../../library/dynarch_calendar.js"></script>
-<?php include_once("{$GLOBALS['srcdir']}/dynarch_calendar_en.inc.php"); ?>
-<script type="text/javascript" src="../../library/dynarch_calendar_setup.js"></script>
-<script type="text/javascript" src="../../library/dialog.js"></script>
-<script type="text/javascript" src="<?php echo $GLOBALS['assets_static_relative']; ?>/jquery-min-1-3-2/index.js"></script>
+<script type="text/javascript" src="../../library/textformat.js?v=<?php echo $v_js_includes; ?>"></script>
+<script type="text/javascript" src="../../library/dialog.js?v=<?php echo $v_js_includes; ?>"></script>
+<script type="text/javascript" src="<?php echo $GLOBALS['assets_static_relative']; ?>/jquery-min-1-7-2/index.js"></script>
 <script type="text/javascript" src="../../library/js/fancybox/jquery.fancybox-1.2.6.js"></script>
+<script type="text/javascript" src="<?php echo $GLOBALS['assets_static_relative']; ?>/jquery-datetimepicker-2-5-4/build/jquery.datetimepicker.full.min.js"></script>
+
 <script language='JavaScript'>
  var mypcc = '1';
 </script>
 <?php include_once("{$GLOBALS['srcdir']}/payment_jav.inc.php"); ?>
 <?php include_once("{$GLOBALS['srcdir']}/ajax/payment_ajax_jav.inc.php"); ?>
-<script type="text/javascript" src="../../library/js/common.js"></script>
+<script type="text/javascript" src="../../library/js/common.js?v=<?php echo $v_js_includes; ?>"></script>
 <script LANGUAGE="javascript" TYPE="text/javascript">
 function ModifyPayments()
  {//Used while modifying the allocation
@@ -696,6 +684,17 @@ function DeletePaymentDistribution(DeleteId)
 	 return false;
  }
 //========================================================================================
+
+$(document).ready(function() {
+    $('.datepicker').datetimepicker({
+        <?php $datetimepicker_timepicker = false; ?>
+        <?php $datetimepicker_showseconds = false; ?>
+        <?php $datetimepicker_formatInput = true; ?>
+        <?php require($GLOBALS['srcdir'] . '/js/xl/jquery-datetimepicker-2-5-4.js.php'); ?>
+        <?php // can add any additional javascript settings to datetimepicker here; need to prepend first setting with a comma ?>
+    });
+});
+
 </script>
 <script language="javascript" type="text/javascript">
 document.onclick=HideTheAjaxDivs;

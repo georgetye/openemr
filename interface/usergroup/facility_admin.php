@@ -1,7 +1,5 @@
 <?php
 include_once("../globals.php");
-include_once("$srcdir/sql.inc");
-require_once("$srcdir/classes/POSRef.class.php");
 require_once("$srcdir/options.inc.php");
 require_once("$srcdir/erx_javascript.inc.php");
 
@@ -30,7 +28,7 @@ parent.$.fn.fancybox.close();
 
     <link rel="stylesheet" href="<?php echo $css_header;?>" type="text/css">
     <link rel="stylesheet" type="text/css" href="../../library/js/fancybox/jquery.fancybox-1.2.6.css" media="screen" />
-    <script type="text/javascript" src="../../library/dialog.js"></script>
+    <script type="text/javascript" src="../../library/dialog.js?v=<?php echo $v_js_includes; ?>"></script>
     <script type="text/javascript" src="<?php echo $GLOBALS['assets_static_relative'] ?>/jquery-min-1-9-1/index.js"></script>
     <script type="text/javascript" src="../../library/js/common.js"></script>
     <script type="text/javascript" src="../../library/js/fancybox/jquery.fancybox-1.2.6.js"></script>
@@ -42,7 +40,6 @@ parent.$.fn.fancybox.close();
     <!--//Not lbf forms use the new validation, please make sure you have the corresponding values in the list Page validation-->
     <?php    $use_validate_js = 1;?>
     <?php  require_once($GLOBALS['srcdir'] . "/validation/validation_script.js.php"); ?>
-    <?php  require_once($GLOBALS['srcdir'] . "/validation/validate_core.php"); ?>
     <?php
     //Gets validation rules from Page Validation list.
     //Note that for technical reasons, we are bypassing the standard validateUsingPageRules() call.
@@ -102,8 +99,8 @@ parent.$.fn.fancybox.close();
             }
             <?php } ?>
 
-            document.forms[0].submit();
             top.restoreSession();
+            document.forms[0].submit();
         }
 
         $(document).ready(function(){

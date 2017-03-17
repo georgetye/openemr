@@ -1,6 +1,6 @@
 <?php
 // Copyright (C) 2011 by following authors:
-//   -Brady Miller <brady@sparmy.com>
+//   -Brady Miller <brady.g.miller@gmail.com>
 //   -Ensofttek, LLC
 //
 // This program is free software; you can redistribute it and/or
@@ -16,7 +16,6 @@ $fake_register_globals=false;
 
 require_once("../../globals.php");
 require_once("$srcdir/options.inc.php");
-require_once("$srcdir/formdata.inc.php");
 require_once("$srcdir/reminders.php");
 require_once("$srcdir/clinical_rules.php");
 require_once "$srcdir/report_database.inc";
@@ -28,7 +27,7 @@ require_once "$srcdir/report_database.inc";
 <link rel="stylesheet" href="<?php echo $css_header;?>" type="text/css">
 
 <style type="text/css">@import url(../../../library/dynarch_calendar.css);</style>
-<script type="text/javascript" src="../../../library/dialog.js"></script>
+<script type="text/javascript" src="../../../library/dialog.js?v=<?php echo $v_js_includes; ?>"></script>
 <script type="text/javascript" src="../../../library/textformat.js"></script>
 <script type="text/javascript" src="../../../library/dynarch_calendar.js"></script>
 <?php include_once("{$GLOBALS['srcdir']}/dynarch_calendar_en.inc.php"); ?>

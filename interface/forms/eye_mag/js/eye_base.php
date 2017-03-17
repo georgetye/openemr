@@ -27,7 +27,6 @@
 
 
     include_once("../../../globals.php");
-    include_once("$srcdir/htmlspecialchars.inc.php");
     include_once("$srcdir/acl.inc");
     include_once("$srcdir/api.inc");
     include_once("$srcdir/forms.inc");
@@ -1263,10 +1262,13 @@ function rebuild_IMP(obj2) {
  * for each member of "items".
  * Duplicates are removed by server.
  */
-function build_IMPPLAN(items) {
+function build_IMPPLAN(items,nodisplay) {
     var contents_here;
-    $('#IMPPLAN_zone').html("");
-    $('#Coding_DX_Codes').html("");
+    if (typeof nodisplay == "undefined") {
+      $('#IMPPLAN_zone').html("");
+    }
+      $('#Coding_DX_Codes').html("");
+
     if ((items == null) || ((typeof items == "undefined")|| (items.length =='0'))) {
         items = [];
         $('#IMPPLAN_text').removeClass('nodisplay'); //Display Builder instructions for starting out
@@ -1419,13 +1421,13 @@ function store_IMPPLAN(storage,nodisplay) {
                type         : 'POST',
                url          :  url,
                dataType     : 'json',
-               data     : {
-               parameter     : formData,
-               action        : 'store_IMPPLAN',
-               pid           : $('#pid').val(),
-               form_id       : $('#form_id').val(),
-               encounter     : $('#encounter').val(),
-               uniqueID      : $('#uniqueID').val()
+               data         : {
+                 parameter     : formData,
+                 action        : 'store_IMPPLAN',
+                 pid           : $('#pid').val(),
+                 form_id       : $('#form_id').val(),
+                 encounter     : $('#encounter').val(),
+                 uniqueID      : $('#uniqueID').val()
                }
                }).done(function(result) {
                        if (result == "Code 400") {
@@ -1433,9 +1435,9 @@ function store_IMPPLAN(storage,nodisplay) {
                        return;
                        }
                        obj.IMPPLAN_items = result;
-                       if (typeof nodisplay === "undefined") {
-                          build_IMPPLAN(obj.IMPPLAN_items);
-                       }
+                    //   if (typeof nodisplay === "undefined") {
+                          build_IMPPLAN(obj.IMPPLAN_items,nodisplay);
+                      // }
                        });
     }
 }
@@ -1578,7 +1580,8 @@ function build_CODING_list() {
                           codedesc: 'Sensorimotor exam',
                           codetext: 'Sensorimotor exam (CPT4:92060)',
                           codetype: 'CPT4',
-                          title:    'Neuro/Sensorimotor Code'
+                          title:    'Neuro/Sensorimotor Code',
+                          justify:  visit_justify
                           });
     }
         //2. Tests/procedures performed to bill
@@ -1588,14 +1591,14 @@ function build_CODING_list() {
                      var codetype = obj.value.match(/(.*):(.*)/)[1];
                      var code = obj.value.match(/(.*):(.*)/)[2];
                      var modifier = $('#'+obj.id+'_modifier').val();
-                     alert(modifier);
+                     //alert(modifier);
                      CODING_items.push({
-                                       'code':     code,
-                                       codedesc: obj.title,
-                                       codetext: obj.codetext,
-                                       codetype: codetype,
-                                       title:    obj.title,
-                                       'modifier': modifier
+                                       'code'     : code,
+                                       'codedesc' : obj.title,
+                                       'codetext' : obj.codetext,
+                                       'codetype' : codetype,
+                                       'title'    : obj.title,
+                                       'modifier' : modifier
                                        });
                      }
                      });
@@ -2103,6 +2106,7 @@ $(document).ready(function() {
                                                    var zone = this.id.match(/sketch_tools_(.*)_/)[1];
                                                    $("[id^='sketch_tools_"+zone+"']").css("height","30px");
                                                    $(this).css("height","50px");
+                                                   $("#sketch_tool_"+zone+"_color").css("background-color",$("#selColor_"+zone).val());
                                                    });
                   $("[id^='sketch_sizes_']").click(function() {
                                                    var zone = this.id.match(/sketch_sizes_(.*)_/)[1];
@@ -3429,29 +3433,12 @@ $(document).ready(function() {
                                             var zone = this.id.match(/Clear_Canvas_(.*)/)[1];
                                             submit_canvas(zone);
                                             });
-                  $("[id^='Base_']").click(function() { //not implemented yet
-                                           var zone = this.id.match(/Base_Canvas_(.*)/)[1];
-                                           //To change the base img
-                                           //delete current image from server
-                                           //re-ajax the canvas div
-                                           var id_here = document.getElementById('myCanvas_'+zone);
-                                           var dataURL = id_here.toDataURL();
-                                           top.restoreSession();
-                                           $.ajax({
-                                                  type: "POST",
-                                                  url: "../../forms/eye_mag/save.php?canvas="+zone+"&id="+$("#form_id").val(),
-                                                  data: {
-                                                  imgBase64     : dataURL,  //this contains the new strokes, the sketch.js foreground
-                                                  'zone'        : zone,
-                                                  'visit_date'  : $("#visit_date").val(),
-                                                  'encounter'   : $("#encounter").val(),
-                                                  'pid'         : $("#pid").val()
-                                                  }
+                  $("[id^='Blank_']").click(function() {
 
-                                                  });
-
-                                           $("#url_"+zone).val("/interface/forms/eye_mag/images/OU_"+zone+"_BASE.png");
-                                           canvas.renderAll();
+                                           var zone = this.id.match(/Blank_Canvas_(.*)/)[1];
+                                           $("#url_"+zone).val("../../forms/eye_mag/images/BLANK_BASE.png");
+                                           //canvas.renderAll();
+                                           drawImage(zone);
                                            });
 
                   $("#COPY_SECTION").change(function() {
@@ -3833,13 +3820,16 @@ $(document).ready(function() {
                                            });
                   show_QP_section('IMPPLAN','1');
                   $('.modifier').on('click', function () {
+                    var item = this.id.match(/visit_mod_(.*)/)[1];
                     if ($(this).hasClass('status_on')) {
                         $(this).css("background-color","navy");
                         $(this).removeClass('status_on');
+                        delete visit_modifier[''+item];
                       } else {
                         $(this).css("background-color","red");
                         $(this).addClass('status_on');
-                      } 
+                        visit_modifier.push(item);
+                      }
                   });
                   build_IMPPLAN(obj.IMPPLAN_items);
                   scroll='1';

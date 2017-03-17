@@ -495,7 +495,7 @@ $billresult = getBillingByEncounter($fs->pid, $fs->encounter, "*");
 <style type="text/css">@import url(../../../library/dynarch_calendar.css);</style>
 
 <script type="text/javascript" src="../../../library/textformat.js"></script>
-<script type="text/javascript" src="../../../library/dialog.js"></script>
+<script type="text/javascript" src="../../../library/dialog.js?v=<?php echo $v_js_includes; ?>"></script>
 <script type="text/javascript" src="../../../library/dynarch_calendar.js"></script>
 <script type="text/javascript" src="../../../library/dynarch_calendar_en.js"></script>
 <script type="text/javascript" src="../../../library/dynarch_calendar_setup.js"></script>
@@ -870,6 +870,7 @@ echo " </tr>\n";
 <?php } // end encounter not billed ?>
 
 <table cellspacing='5'>
+ <?php if ($billresult) { ?>
  <tr>
   <td class='billcell'><b><?php echo xlt('Type');?></b></td>
   <td class='billcell'><b><?php echo xlt('Code');?></b></td>
@@ -895,7 +896,7 @@ echo " </tr>\n";
 <?php } ?>  
   <td class='billcell' align='center'><b><?php echo xlt('Delete');?></b></td>
  </tr>
-
+ <?php } ?>
 <?php
 $justinit = "var f = document.forms[0];\n";
 

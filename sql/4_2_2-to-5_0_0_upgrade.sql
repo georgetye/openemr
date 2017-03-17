@@ -2190,3 +2190,36 @@ INSERT INTO list_options (list_id,option_id,title,seq,notes,activity) VALUES ('f
  INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('provider_qualifier_code','dk','DK',10,0);
  INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('provider_qualifier_code','dn','DN',20,0);
 #EndIf
+
+#IfNotTable codes_history
+CREATE TABLE `codes_history` (
+  `log_id` bigint(20) NOT NULL auto_increment,
+  `date` datetime,
+  `code` varchar(25),
+  `modifier` varchar(12),
+  `active` tinyint(1),
+  `diagnosis_reporting` tinyint(1),
+  `financial_reporting` tinyint(1),
+  `category` varchar(255),
+  `code_type_name` varchar(255),
+  `code_text` varchar(255),
+  `code_text_short` varchar(24),
+  `prices` text,
+  `action_type` varchar(25),
+  `update_by` varchar(255),
+  PRIMARY KEY (`log_id`)
+) ENGINE=InnoDB;
+#EndIf
+
+#IfMissingColumn form_care_plan care_plan_type
+ALTER TABLE form_care_plan ADD COLUMN care_plan_type VARCHAR(30) DEFAULT NULL;
+#EndIf
+
+#IfNotRow2D list_options list_id lists option_id Plan_of_Care_Type
+INSERT INTO `list_options` (`list_id`, `option_id`, `title`, `seq`, `is_default`, `option_value`, `mapping`, `notes`, `codes`, `activity`, `toggle_setting_1`, `toggle_setting_2`, `subtype`) VALUES('lists','Plan_of_Care_Type','Plan of Care Type','305','1','0','','','','1','0','0','');
+INSERT INTO `list_options` (`list_id`, `option_id`, `title`, `seq`, `is_default`, `option_value`, `mapping`, `notes`, `codes`, `activity`, `toggle_setting_1`, `toggle_setting_2`, `subtype`) VALUES('Plan_of_Care_Type','appointments','Appointments','4','0','0','','INT','','1','0','0','');
+INSERT INTO `list_options` (`list_id`, `option_id`, `title`, `seq`, `is_default`, `option_value`, `mapping`, `notes`, `codes`, `activity`, `toggle_setting_1`, `toggle_setting_2`, `subtype`) VALUES('Plan_of_Care_Type','instructions','Instructions','5','0','0','','INT','','1','0','0','');
+INSERT INTO `list_options` (`list_id`, `option_id`, `title`, `seq`, `is_default`, `option_value`, `mapping`, `notes`, `codes`, `activity`, `toggle_setting_1`, `toggle_setting_2`, `subtype`) VALUES('Plan_of_Care_Type','plan_of_care','Plan of Care','1','0','0','','INT','','1','0','0','');
+INSERT INTO `list_options` (`list_id`, `option_id`, `title`, `seq`, `is_default`, `option_value`, `mapping`, `notes`, `codes`, `activity`, `toggle_setting_1`, `toggle_setting_2`, `subtype`) VALUES('Plan_of_Care_Type','procedure','Procedure','3','0','0','','RQO','','1','0','0','');
+INSERT INTO `list_options` (`list_id`, `option_id`, `title`, `seq`, `is_default`, `option_value`, `mapping`, `notes`, `codes`, `activity`, `toggle_setting_1`, `toggle_setting_2`, `subtype`) VALUES('Plan_of_Care_Type','test_or_order','Test/Order','2','0','0','','RQO','','1','0','0','');
+#EndIf

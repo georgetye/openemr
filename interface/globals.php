@@ -1,5 +1,13 @@
 <?php
 
+// Checks if the server's PHP version is compatible with OpenEMR:
+require_once(dirname(__FILE__) . "/../common/compatibility/checker.php");
+
+$response = Checker::checkPhpVersion();
+if ($response !== true) {
+  die($response);
+}
+
 // Default values for optional variables that are allowed to be set by callers.
 
 // Unless specified explicitly, apply Auth functions
@@ -176,30 +184,33 @@ $GLOBALS['login_screen'] = $GLOBALS['rootdir'] . "/login_screen.php";
 // Variable set for Eligibility Verification [EDI-271] path
 $GLOBALS['edi_271_file_path'] = $GLOBALS['OE_SITE_DIR'] . "/edi/";
 
-// Include the translation engine. This will also call sql.inc to
-//  open the openemr mysql connection.
-require_once (dirname(__FILE__) . "/../library/translation.inc.php");
-
-// Include convenience functions with shorter names than "htmlspecialchars" (for security)
-require_once (dirname(__FILE__) . "/../library/htmlspecialchars.inc.php");
-
-// Include sanitization/checking functions (for security)
-require_once (dirname(__FILE__) . "/../library/formdata.inc.php");
-
-// Include sanitization/checking function (for security)
-require_once (dirname(__FILE__) . "/../library/sanitize.inc.php");
-
-// Includes functions for date internationalization
-require_once (dirname(__FILE__) . "/../library/date_functions.php");
-
-// Includes compoaser autoload
+// Includes composer autoload
+// Note this also brings in following library files:
+//  library/htmlspecialchars.inc.php - Include convenience functions with shorter names than "htmlspecialchars" (for security)
+//  library/formdata.inc.php - Include sanitization/checking functions (for security)
+//  library/sanitize.inc.php - Include sanitization/checking functions (for security)
+//  library/date_functions.php - Includes functions for date internationalization
+//  library/validation/validate_core.php - Includes functions for page validation
+//  library/translation.inc.php - Includes translation functions
 require_once $GLOBALS['vendor_dir'] ."/autoload.php";
 
-// Includes functions for page validation
-require_once (dirname(__FILE__) . "/../library/validation/validate_core.php");
+// This will open the openemr mysql connection.
+require_once (dirname(__FILE__) . "/../library/sql.inc");
 
 // Include the version file
 require_once (dirname(__FILE__) . "/../version.php");
+
+// The logging level for common/logging/logger.php
+// Value can be TRACE, DEBUG, INFO, WARN, ERROR, or OFF:
+//    - DEBUG/INFO are great for development
+//    - INFO/WARN/ERROR are great for production
+//    - TRACE is useful when debugging hard to spot bugs
+$GLOBALS["log_level"] = "OFF";
+
+// Should Doctrine make use of connection pooling? Database connection pooling is a method
+// used to keep database connections open so they can be reused by others. (The only reason
+// to not use connection pooling is if your server has limited resources.)
+$GLOBALS["doctrine_connection_pooling"] = true;
 
 // Defaults for specific applications.
 $GLOBALS['weight_loss_clinic'] = false;
@@ -302,7 +313,15 @@ if (!empty($glrow)) {
             $rtl_override = true;
         }
     }
-
+    else if (isset( $_SESSION['language_choice'] )) {
+        //this will support the onsite patient portal which will have a language choice but not yet a set language direction
+        $_SESSION['language_direction'] = getLanguageDir($_SESSION['language_choice']);
+        if ( $_SESSION['language_direction'] == 'rtl' &&
+        !strpos($GLOBALS['css_header'], 'rtl')) {
+            // the $css_header_value is set above
+            $rtl_override = true;
+        }
+    }
     else {
         //$_SESSION['language_direction'] is not set, so will use the default language
         $default_lang_id = sqlQuery('SELECT lang_id FROM lang_languages WHERE lang_description = ?',array($GLOBALS['language_default']));
@@ -408,12 +427,24 @@ if (!empty($special_timeout)) {
   $timeout = intval($special_timeout);
 }
 
-//Version tag
-$patch_appending = "";
-if ( ($v_realpatch != '0') && (!(empty($v_realpatch))) ) {
-$patch_appending = " (".$v_realpatch.")";
+$versionService = new \services\VersionService();
+$version = $versionService->fetch();
+
+if (!empty($version)) {
+    //Version tag
+    $patch_appending = "";
+    //Collected below function call to a variable, since unable to directly include
+    // function calls within empty() in php versions < 5.5 .
+    $version_getrealpatch = $version->getRealPatch();
+    if ( ($version->getRealPatch() != '0') && (!(empty($version_getrealpatch))) ) {
+        $patch_appending = " (".$version->getRealPatch().")";
+    }
+
+    $openemr_version = $version->getMajor() . "." . $version->getMinor() . "." . $version->getPatch();
+    $openemr_version .= $version->getTag() . $patch_appending;
+} else {
+    $openemr_version = xl('Unknown version');
 }
-$openemr_version = "$v_major.$v_minor.$v_patch".$v_tag.$patch_appending;
 
 $srcdir = $GLOBALS['srcdir'];
 $login_screen = $GLOBALS['login_screen'];
@@ -468,6 +499,10 @@ elseif (!empty($_POST['pid']) && empty($_SESSION['pid'])) {
 $pid = empty($_SESSION['pid']) ? 0 : $_SESSION['pid'];
 $userauthorized = empty($_SESSION['userauthorized']) ? 0 : $_SESSION['userauthorized'];
 $groupname = empty($_SESSION['authProvider']) ? 0 : $_SESSION['authProvider'];
+
+//This is crucial for therapy groups and patients mechanisms to work together properly
+$attendant_type = (empty($pid) && isset($_SESSION['therapy_group'])) ? 'gid' : 'pid';
+$therapy_group = (empty($pid) && isset($_SESSION['therapy_group'])) ? $_SESSION['therapy_group'] : 0;
 
 // global interface function to format text length using ellipses
 function strterm($string,$length) {
